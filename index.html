@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Диалоговый тренажёр · Но-шпа</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --accent: #FF7142;
+    --accent-dark: #E85A2B;
+    --accent-soft: #FFF1EB;
+    --accent-line: #FFD9C9;
+    --white: #FFFFFF;
+    --bg: #F5F6F8;
+    --grey-100: #EEF0F3;
+    --grey-200: #E2E5EA;
+    --grey-300: #D0D4DB;
+    --grey-500: #9AA0A6;
+    --grey-700: #5A6270;
+    --text: #2B2F36;
+    --danger: #C94A4A;
+    --danger-soft: #FCEFEF;
+    --shadow: 0 6px 24px rgba(43,47,54,.07);
+    --radius: 20px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html, body{height:100%}
+  body{
+    font-family:'Montserrat',-apple-system,BlinkMacSystemFont,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    padding:24px 16px;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.5;
+  }
+  .app{
+    width:100%;
+    max-width:780px;
+    background:var(--white);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    height:calc(100vh - 48px);
+    min-height:560px;
+  }
+
+  /* ---------- HEADER ---------- */
+  .header{
+    padding:18px 24px;
+    border-bottom:1px solid var(--grey-200);
+    flex-shrink:0;
+  }
+  .header-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:8px;
+    gap:12px;
+  }
+  .header-title{
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--grey-500);
+    font-weight:600;
+  }
+  .header-badge{
+    font-size:12px;
+    font-weight:600;
+    color:var(--accent);
+    background:var(--accent-soft);
+    padding:4px 12px;
+    border-radius:999px;
+    white-space:nowrap;
+  }
+  .header-subtitle{
+    font-size:17px;
+    font-weight:700;
+    margin-bottom:12px;
+    letter-spacing:-.01em;
+  }
+  .progress{
+    height:6px;
+    background:var(--grey-100);
+    border-radius:999px;
+    overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;
+    background:var(--accent);
+    width:0;
+    border-radius:999px;
+    transition:width .45s cubic-bezier(.2,.8,.3,1);
+  }
+  .hidden{display:none !important}
+
+  /* ---------- SCREEN ---------- */
+  .screen{
+    flex:1;
+    padding:24px;
+    overflow-y:auto;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    scroll-behavior:smooth;
+  }
+  .screen::-webkit-scrollbar{width:8px}
+  .screen::-webkit-scrollbar-thumb{background:var(--grey-200);border-radius:4px}
+
+  /* ---------- INTRO ---------- */
+  .intro{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+    gap:16px;
+    padding:16px 8px;
+    margin:auto 0;
+    animation:fadeUp .5s ease both;
+  }
+  .intro-icon{
+    width:76px;height:76px;
+    border-radius:22px;
+    background:var(--accent-soft);
+    color:var(--accent);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .intro h1{
+    font-size:24px;
+    font-weight:800;
+    letter-spacing:-.02em;
+  }
+  .intro-sub{
+    font-size:14px;
+    font-weight:600;
+    color:var(--accent);
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    margin-top:-8px;
+  }
+  .intro-text{
+    font-size:14.5px;
+    color:var(--grey-700);
+    max-width:520px;
+    line-height:1.6;
+  }
+  .intro-list{
+    list-style:none;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    text-align:left;
+    background:var(--grey-100);
+    border-radius:14px;
+    padding:16px 20px;
+    max-width:460px;
+    width:100%;
+  }
+  .intro-list li{
+    font-size:13.5px;
+    color:var(--grey-700);
+    padding-left:22px;
+    position:relative;
+    line-height:1.45;
+  }
+  .intro-list li::before{
+    content:'';
+    position:absolute;
+    left:0;top:6px;
+    width:10px;height:10px;
+    border-radius:50%;
+    background:var(--accent);
+  }
+  .start-btn{
+    background:var(--accent);
+    color:#fff;
+    border:none;
+    border-radius:12px;
+    padding:15px 34px;
+    font-family:inherit;
+    font-size:15px;
+    font-weight:700;
+    cursor:pointer;
+    transition:all .18s ease;
+    box-shadow:0 6px 18px rgba(255,113,66,.28);
+    margin-top:4px;
+  }
+  .start-btn:hover{
+    background:var(--accent-dark);
+    transform:translateY(-2px);
+    box-shadow:0 10px 24px rgba(255,113,66,.35);
+  }
+  .start-btn:active{transform:translateY(0)}
+
+  /* ---------- STEP ---------- */
+  .step-title{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.12em;
+    color:var(--accent);
+    font-weight:700;
+  }
+  .context{
+    font-size:13px;
+    color:var(--grey-500);
+    font-style:italic;
+    margin-top:-6px;
+  }
+
+  .chat-area{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    margin-top:6px;
+  }
+  .chat{
+    display:flex;
+    gap:10px;
+    align-items:flex-end;
+    animation:fadeUp .35s ease both;
+  }
+  .chat.pharm{flex-direction:row-reverse}
+  .avatar{
+    flex-shrink:0;
+    width:36px;height:36px;
+    border-radius:50%;
+    background:var(--grey-100);
+    color:var(--grey-700);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .avatar.pharm-avatar{
+    background:var(--accent-soft);
+    color:var(--accent);
+  }
+  .bubble{
+    background:var(--grey-100);
+    padding:11px 15px;
+    border-radius:4px 16px 16px 16px;
+    font-size:14.5px;
+    line-height:1.5;
+    max-width:82%;
+    color:var(--text);
+  }
+  .chat.pharm .bubble{
+    background:var(--accent-soft);
+    border:1px solid var(--accent-line);
+    border-radius:16px 4px 16px 16px;
+  }
+
+  /* ---------- OPTIONS ---------- */
+  .options{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-top:8px;
+  }
+  .option{
+    text-align:left;
+    background:var(--white);
+    border:1.5px solid var(--grey-200);
+    border-radius:14px;
+    padding:14px 18px;
+    font-family:inherit;
+    font-size:14.5px;
+    color:var(--text);
+    cursor:pointer;
+    transition:all .16s ease;
+    line-height:1.5;
+    display:flex;
+    gap:12px;
+    align-items:flex-start;
+  }
+  .option::before{
+    content:'';
+    flex-shrink:0;
+    width:18px;height:18px;
+    margin-top:2px;
+    border-radius:50%;
+    border:2px solid var(--grey-300);
+    transition:all .16s ease;
+  }
+  .option:hover:not(:disabled){
+    border-color:var(--accent);
+    background:var(--accent-soft);
+    transform:translateY(-1px);
+    box-shadow:0 4px 14px rgba(255,113,66,.12);
+  }
+  .option:hover:not(:disabled)::before{
+    border-color:var(--accent);
+  }
+  .option:disabled{cursor:default}
+  .option.selected.correct{
+    border-color:var(--accent);
+    background:var(--accent-soft);
+  }
+  .option.selected.correct::before{
+    border-color:var(--accent);
+    background:var(--accent);
+    box-shadow:inset 0 0 0 3px var(--accent-soft);
+  }
+  .option.selected.partial{
+    border-color:var(--grey-500);
+    background:var(--grey-100);
+  }
+  .option.selected.partial::before{
+    border-color:var(--grey-500);
+    background:var(--grey-500);
+    box-shadow:inset 0 0 0 3px var(--grey-100);
+  }
+  .option.selected.wrong{
+    border-color:var(--danger);
+    background:var(--danger-soft);
+  }
+  .option.selected.wrong::before{
+    border-color:var(--danger);
+    background:var(--danger);
+    box-shadow:inset 0 0 0 3px var(--danger-soft);
+  }
+  .option.dim{opacity:.45}
+
+  /* ---------- FEEDBACK ---------- */
+  .feedback{
+    display:none;
+    border-radius:14px;
+    padding:16px 18px;
+    border-left:4px solid;
+    font-size:14px;
+    line-height:1.55;
+    animation:fadeUp .3s ease both;
+  }
+  .feedback.show{display:block}
+  .feedback.correct{background:var(--accent-soft);border-color:var(--accent)}
+  .feedback.partial{background:var(--grey-100);border-color:var(--grey-500)}
+  .feedback.wrong{background:var(--danger-soft);border-color:var(--danger)}
+  .feedback-title{
+    font-weight:700;
+    margin-bottom:6px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:14.5px;
+  }
+  .feedback.correct .feedback-title{color:var(--accent)}
+  .feedback.partial .feedback-title{color:var(--grey-700)}
+  .feedback.wrong .feedback-title{color:var(--danger)}
+  .feedback-icon{
+    width:22px;height:22px;
+    border-radius:50%;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    font-size:12px;
+    font-weight:800;
+    color:#fff;
+    flex-shrink:0;
+  }
+  .feedback.correct .feedback-icon{background:var(--accent)}
+  .feedback.partial .feedback-icon{background:var(--grey-500)}
+  .feedback.wrong .feedback-icon{background:var(--danger)}
+  .feedback-text{color:var(--grey-700);font-size:14px}
+
+  /* ---------- NEXT BUTTON ---------- */
+  .next-btn{
+    display:none;
+    align-self:flex-end;
+    background:var(--accent);
+    color:#fff;
+    border:none;
+    border-radius:12px;
+    padding:13px 28px;
+    font-family:inherit;
+    font-size:14.5px;
+    font-weight:700;
+    cursor:pointer;
+    transition:all .18s ease;
+    margin-top:6px;
+    box-shadow:0 6px 18px rgba(255,113,66,.24);
+  }
+  .next-btn.show{display:inline-block;animation:fadeUp .3s ease both}
+  .next-btn:hover{
+    background:var(--accent-dark);
+    transform:translateY(-2px);
+    box-shadow:0 10px 24px rgba(255,113,66,.32);
+  }
+  .next-btn:active{transform:translateY(0)}
+
+  /* ---------- RESULT ---------- */
+  .result{
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+    padding:8px 0;
+    animation:fadeUp .5s ease both;
+  }
+  .result-head{text-align:center}
+  .result-label{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.14em;
+    color:var(--grey-500);
+    font-weight:600;
+    margin-bottom:10px;
+  }
+  .result-score{
+    font-size:56px;
+    font-weight:800;
+    color:var(--accent);
+    line-height:1;
+    letter-spacing:-.03em;
+  }
+  .result-score small{
+    font-size:20px;
+    color:var(--grey-500);
+    font-weight:600;
+    letter-spacing:0;
+  }
+  .result-rating{
+    font-size:22px;
+    font-weight:800;
+    margin-top:10px;
+    letter-spacing:-.01em;
+  }
+  .result-rating.correct{color:var(--accent)}
+  .result-rating.partial{color:var(--grey-700)}
+  .result-rating.wrong{color:var(--danger)}
+  .result-text{
+    font-size:14.5px;
+    color:var(--grey-700);
+    line-height:1.6;
+    max-width:560px;
+    margin:8px auto 0;
+    text-align:center;
+  }
+  .breakdown{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    margin-top:6px;
+  }
+  .breakdown-title{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.12em;
+    color:var(--grey-500);
+    font-weight:700;
+    margin-bottom:4px;
+  }
+  .breakdown-item{
+    background:var(--grey-100);
+    border-radius:12px;
+    padding:12px 16px;
+    font-size:13.5px;
+    display:flex;
+    gap:14px;
+    align-items:flex-start;
+    line-height:1.45;
+  }
+  .breakdown-item .bi-score{
+    font-weight:800;
+    min-width:44px;
+    flex-shrink:0;
+    font-size:14px;
+  }
+  .breakdown-item.correct .bi-score{color:var(--accent)}
+  .breakdown-item.partial .bi-score{color:var(--grey-700)}
+  .breakdown-item.wrong .bi-score{color:var(--danger)}
+  .breakdown-item .bi-body{flex:1}
+  .breakdown-item .bi-step{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--grey-500);
+    font-weight:600;
+    margin-bottom:3px;
+  }
+  .breakdown-item .bi-choice{
+    color:var(--text);
+    font-weight:500;
+  }
+  .restart-btn{
+    align-self:center;
+    background:var(--white);
+    color:var(--accent);
+    border:1.5px solid var(--accent);
+    border-radius:12px;
+    padding:13px 30px;
+    font-family:inherit;
+    font-size:14.5px;
+    font-weight:700;
+    cursor:pointer;
+    transition:all .18s ease;
+    margin-top:8px;
+  }
+  .restart-btn:hover{
+    background:var(--accent);
+    color:#fff;
+    transform:translateY(-2px);
+    box-shadow:0 8px 20px rgba(255,113,66,.28);
+  }
+
+  /* ---------- ANIMATIONS ---------- */
+  @keyframes fadeUp{
+    from{opacity:0;transform:translateY(8px)}
+    to{opacity:1;transform:translateY(0)}
+  }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width:560px){
+    body{padding:0}
+    .app{
+      border-radius:0;
+      height:100vh;
+      min-height:100vh;
+    }
+    .header{padding:16px 18px}
+    .screen{padding:18px}
+    .result-score{font-size:46px}
+    .intro h1{font-size:20px}
+    .bubble{max-width:88%}
+  }
+</style>
+</head>
+<body>
+
+<div class="app" id="app">
+  <header class="header" id="header">
+    <div class="header-top">
+      <div class="header-title">Диалоговый тренажёр</div>
+      <div class="header-badge" id="progressText">Инструктаж</div>
+    </div>
+    <div class="header-subtitle">Отработка возражений · Но-шпа</div>
+    <div class="progress"><div class="progress-fill" id="progressFill"></div></div>
+  </header>
+  <main class="screen" id="screen"></main>
+</div>
+
+<script>
+/* =========================================================
+   СЦЕНАРИЙ ТРЕНАЖЁРА
+   ========================================================= */
+const SCENARIO = [
+  {
+    title: 'Шаг 1 · Первый контакт',
+    context: 'Клиент заходит в аптеку и подходит к первому столу.',
+    clientText: 'Здравствуйте! Дайте мне, пожалуйста, Но-шпу.',
+    options: [
+      {
+        text: 'Здравствуйте! Но-шпа есть в наличии. Подскажите, для каких целей вы её принимаете?',
+        score: 10,
+        verdict: 'correct',
+        feedback: 'Отлично! Вы поздоровались, подтвердили наличие и задали открытый вопрос, чтобы выявить потребность. Это основа грамотной консультации — а не «продайте и молчите».'
+      },
+      {
+        text: 'Здравствуйте. Но-шпа стоит 380 рублей за упаковку.',
+        score: 3,
+        verdict: 'partial',
+        feedback: 'Нейтрально. Информацию вы дали, но потребность не выяснили. Клиент уйдёт с мыслью «просто дайте то, что прошу» — дополнительной продажи не будет.'
+      },
+      {
+        text: 'А зачем вам именно Но-шпа? Есть же дешёвый дротаверин.',
+        score: 0,
+        verdict: 'wrong',
+        feedback: 'Ошибка. Возражение «до» покупки вызывает у клиента защитную реакцию. Он ещё не рассказал о проблеме, а вы уже предлагаете замену — это читается как навязывание.'
+      }
+    ]
+  },
+  {
+    title: 'Шаг 2 · Выявление потребности',
+    context: 'Клиент охотно идёт на контакт.',
+    clientText: 'У меня периодически спазмы в животе, особенно ночью. Врач как-то советовал Но-шпу.',
+    options: [
+      {
+        text: 'Понятно. А как давно это началось? Что-то ещё беспокоит — тяжесть, вздутие?',
+        score: 10,
+        verdict: 'correct',
+        feedback: 'Верно! Вы копаете глубже и собираете картину. Это позволит позже предложить дополнительный продукт без давления и «в тему».'
+      },
+      {
+        text: 'Понятно. Но-шпа отлично снимает спазмы. Ещё рекомендую магний — он тоже помогает.',
+        score: 5,
+        verdict: 'partial',
+        feedback: 'Вектор правильный, но рано. Вы ещё не выяснили картину — а уже рекомендуете. Клиент может воспринять это как попытку «продать побольше».'
+      },
+      {
+        text: 'Понятно. Тогда возьмите две упаковки, чтобы был запас.',
+        score: 0,
+        verdict: 'wrong',
+        feedback: 'Плохо. Потребность не выяснена, а чек уже увеличиваете. Клиент теряет доверие и закрывается.'
+      }
+    ]
+  },
+  {
+    title: 'Шаг 3 · Возражение «мне нужна именно Но-шпа»',
+    context: 'Клиент напрягся, услышав про магний.',
+    clientText: 'Слушайте, а вот это всё — магний, аналоги... Мне нужна именно Но-шпа. Я её всегда беру.',
+    options: [
+      {
+        text: 'Конечно, Но-шпа есть в наличии, я сейчас её принесу. Я и не предлагаю замену — просто хочу помочь комплексно, если захотите.',
+        score: 10,
+        verdict: 'correct',
+        feedback: 'Идеально. Вы сняли напряжение («конечно, есть»), не давите и оставляете право выбора за клиентом. Такой ответ возвращает контакт.'
+      },
+      {
+        text: 'Но-шпа и дротаверин — это одно и то же вещество, просто бренд дороже.',
+        score: 3,
+        verdict: 'partial',
+        feedback: 'Формально верно, но это обесценивает выбор клиента. Он слышит: «вы не разбираетесь, а я лучше знаю, что вам надо».'
+      },
+      {
+        text: 'Как хотите, дело ваше.',
+        score: 0,
+        verdict: 'wrong',
+        feedback: 'Плохо. Вы отстранились и потеряли контакт. Клиент чувствует, что неинтересен — и может уйти в другую аптеку.'
+      }
+    ]
+  },
+  {
+    title: 'Шаг 4 · Возражение по цене',
+    context: 'Вы принесли Но-шпу. Клиент смотрит на ценник.',
+    clientText: 'Ой, 380 рублей? Дороговато... Вон, дротаверин — 90.',
+    options: [
+      {
+        text: 'Понимаю. Дротаверин — действительно выгоднее, действующее вещество то же. Но-шпа — это проверенный временем бренд. Что для вас важнее: цена или привычный препарат?',
+        score: 10,
+        verdict: 'correct',
+        feedback: 'Отлично. Вы не спорите и не обесцениваете, а даёте выбор через вопрос. Приём «выбор без выбора» работает без давления.'
+      },
+      {
+        text: 'Берите лучше Но-шпу, дротаверин хуже.',
+        score: 0,
+        verdict: 'wrong',
+        feedback: 'Ошибка. Прямое сравнение «хуже» без аргументов — это давление. Клиент защищается и уходит.'
+      },
+      {
+        text: 'Ну, можете взять дротаверин, разница только в цене.',
+        score: 5,
+        verdict: 'partial',
+        feedback: 'Нейтрально. Лояльность вы сохранили, но ценность бренда не подсветили. Дополнительной продажи не будет.'
+      }
+    ]
+  },
+  {
+    title: 'Шаг 5 · Возврат к дополнительной рекомендации',
+    context: 'Клиент расслабился и улыбается.',
+    clientText: 'Ладно, давайте всё-таки Но-шпу. И что вы там про магний говорили?',
+    options: [
+      {
+        text: 'Отлично! Но-шпа — одна упаковка. Магний с B6 помогает снизить частоту спазмов, если принимать курсом. Показать?',
+        score: 10,
+        verdict: 'correct',
+        feedback: 'Супер! Вы мягко вернулись к дополнительной рекомендации через пользу, а не через «надо». Клиент сам проявил интерес — это лучший момент для апселла.'
+      },
+      {
+        text: 'Магний не обязателен, но можно. Стоит 450 рублей.',
+        score: 5,
+        verdict: 'partial',
+        feedback: 'Полууверенно. Фраза «не обязателен» снижает ценность. Клиент может решить, что и правда не нужно.'
+      },
+      {
+        text: 'Магний принимают по 2 таблетки 3 раза в день, курс 2 месяца. С вас 830 рублей.',
+        score: 3,
+        verdict: 'wrong',
+        feedback: 'Сухо и навязчиво. Клиенту не объяснили пользу — только цену и схему. Это отпугивает.'
+      }
+    ]
+  }
+];
+
+const MAX_SCORE = SCENARIO.length * 10;
+
+/* =========================================================
+   СОСТОЯНИЕ
+   ========================================================= */
+const state = {
+  phase: 'intro', // intro | step | result
+  stepIndex: 0,
+  score: 0,
+  answered: false,
+  log: [],       // чат: { role: 'client' | 'pharm', text, verdict? }
+  answers: []    // { stepTitle, choiceText, verdict, score }
+};
+
+/* =========================================================
+   DOM
+   ========================================================= */
+const els = {
+  app: document.getElementById('app'),
+  header: document.getElementById('header'),
+  screen: document.getElementById('screen'),
+  progressFill: document.getElementById('progressFill'),
+  progressText: document.getElementById('progressText')
+};
+
+const AVATAR_CLIENT = `
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/>
+  <path d="M4.5 20.5c0-4.1 3.4-7.5 7.5-7.5s7.5 3.4 7.5 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+</svg>`;
+
+const AVATAR_PHARM = `
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M9 3h6v4H9z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+  <rect x="4" y="7" width="16" height="14" rx="3" stroke="currentColor" stroke-width="2"/>
+  <path d="M12 12v5M9.5 14.5h5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+</svg>`;
+
+const ICON_PILL = `
+<svg width="38" height="38" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="2.5" y="8.5" width="19" height="7" rx="3.5" transform="rotate(-45 12 12)" stroke="currentColor" stroke-width="2"/>
+  <path d="M9 9l6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+</svg>`;
+
+/* =========================================================
+   УТИЛИТЫ
+   ========================================================= */
+function escapeHTML(str){
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function setProgress(percent, text){
+  els.progressFill.style.width = Math.max(0, Math.min(100, percent)) + '%';
+  els.progressText.textContent = text;
+}
+
+function scrollToBottom(){
+  requestAnimationFrame(() => {
+    els.screen.scrollTop = els.screen.scrollHeight;
+  });
+}
+
+/* =========================================================
+   ЭКРАН: ИНТРО
+   ========================================================= */
+function renderIntro(){
+  state.phase = 'intro';
+  setProgress(0, 'Инструктаж');
+
+  els.screen.innerHTML = `
+    <div class="intro">
+      <div class="intro-icon">${ICON_PILL}</div>
+      <h1>Отработка возражений</h1>
+      <div class="intro-sub">Клиент пришёл за Но-шпой</div>
+      <p class="intro-text">
+        Вы — фармацевт первого стола. За 5 шагов вы проведёте консультацию:
+        выявите потребность, отработаете возражения клиента и предложите
+        дополнительный продукт. Ошибки разберём после каждого шага.
+      </p>
+      <ul class="intro-list">
+        <li>Внимательно читайте реплики клиента и контекст</li>
+        <li>Выбирайте один из трёх вариантов ответа</li>
+        <li>После выбора — разбор с пояснением и баллами</li>
+        <li>В конце — итоговый результат и детальный анализ</li>
+      </ul>
+      <button class="start-btn" id="startBtn">Начать тренажёр</button>
+    </div>
+  `;
+
+  document.getElementById('startBtn').addEventListener('click', () => {
+    state.stepIndex = 0;
+    state.score = 0;
+    state.answers = [];
+    state.log = [];
+    renderStep();
+  });
+}
+
+/* =========================================================
+   ЭКРАН: ШАГ
+   ========================================================= */
+function renderStep(){
+  state.phase = 'step';
+  state.answered = false;
+
+  const step = SCENARIO[state.stepIndex];
+  const progress = (state.stepIndex / SCENARIO.length) * 100;
+  setProgress(progress, `Шаг ${state.stepIndex + 1} из ${SCENARIO.length}`);
+
+  els.screen.innerHTML = `
+    <div class="step-title">${escapeHTML(step.title)}</div>
+    <div class="context">${escapeHTML(step.context)}</div>
+    <div class="chat-area" id="chatArea"></div>
+    <div class="options" id="optionsArea"></div>
+    <div class="feedback" id="feedbackArea"></div>
+    <button class="next-btn" id="nextBtn"></button>
+  `;
+
+  renderChat();
+  renderOptions();
+  scrollToBottom();
+}
+
+function renderChat(){
+  const step = SCENARIO[state.stepIndex];
+  const area = document.getElementById('chatArea');
+  if (!area) return;
+
+  let html = state.log.map(item => {
+    if (item.role === 'client') {
+      return `
+        <div class="chat client">
+          <div class="avatar">${AVATAR_CLIENT}</div>
+          <div class="bubble">${escapeHTML(item.text)}</div>
+        </div>`;
+    } else {
+      return `
+        <div class="chat pharm">
+          <div class="avatar pharm-avatar">${AVATAR_PHARM}</div>
+          <div class="bubble">${escapeHTML(item.text)}</div>
+        </div>`;
+    }
+  }).join('');
+
+  if (!state.answered) {
+    html += `
+      <div class="chat client">
+        <div class="avatar">${AVATAR_CLIENT}</div>
+        <div class="bubble">${escapeHTML(step.clientText)}</div>
+      </div>`;
+  }
+
+  area.innerHTML = html;
+  scrollToBottom();
+}
+
+function renderOptions(){
+  const step = SCENARIO[state.stepIndex];
+  const area = document.getElementById('optionsArea');
+  area.innerHTML = '';
+
+  step.options.forEach((opt, idx) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'option';
+    btn.innerHTML = `<span>${escapeHTML(opt.text)}</span>`;
+    btn.addEventListener('click', () => selectOption(idx));
+    area.appendChild(btn);
+  });
+}
+
+function selectOption(idx){
+  if (state.answered) return;
+  state.answered = true;
+
+  const step = SCENARIO[state.stepIndex];
+  const opt = step.options[idx];
+
+  state.score += opt.score;
+  state.answers.push({
+    stepTitle: step.title,
+    choiceText: opt.text,
+    verdict: opt.verdict,
+    score: opt.score,
+    feedback: opt.feedback
+  });
+
+  state.log.push({ role: 'client', text: step.clientText });
+  state.log.push({ role: 'pharm', text: opt.text, verdict: opt.verdict });
+
+  renderChat();
+
+  // Блокируем кнопки и подсвечиваем выбор
+  const buttons = document.querySelectorAll('#optionsArea .option');
+  buttons.forEach((btn, i) => {
+    btn.disabled = true;
+    if (i === idx) {
+      btn.classList.add('selected', opt.verdict);
+    } else {
+      btn.classList.add('dim');
+    }
+  });
+
+  // Фидбэк
+  const verdictLabels = {
+    correct: 'Отличный ответ',
+    partial: 'Можно лучше',
+    wrong: 'Слабая реакция'
+  };
+  const verdictIcons = { correct: '✓', partial: '~', wrong: '✕' };
+
+  const fb = document.getElementById('feedbackArea');
+  fb.className = 'feedback show ' + opt.verdict;
+  fb.innerHTML = `
+    <div class="feedback-title">
+      <span class="feedback-icon">${verdictIcons[opt.verdict]}</span>
+      ${verdictLabels[opt.verdict]} · +${opt.score} ${plural(opt.score, 'балл', 'балла', 'баллов')}
+    </div>
+    <div class="feedback-text">${escapeHTML(opt.feedback)}</div>
+  `;
+
+  // Кнопка «Далее»
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.classList.add('show');
+  nextBtn.textContent = (state.stepIndex === SCENARIO.length - 1)
+    ? 'Показать результат'
+    : 'Продолжить';
+  nextBtn.addEventListener('click', goNext, { once: true });
+
+  scrollToBottom();
+}
+
+function plural(n, one, few, many){
+  const mod10 = n % 10;
+  const mod100 = n % 100;
+  if (mod10 === 1 && mod100 !== 11) return one;
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return few;
+  return many;
+}
+
+function goNext(){
+  if (state.stepIndex < SCENARIO.length - 1) {
+    state.stepIndex++;
+    renderStep();
+  } else {
+    renderResult();
+  }
+}
+
+/* =========================================================
+   ЭКРАН: РЕЗУЛЬТАТ
+   ========================================================= */
+function getRating(percent){
+  if (percent >= 90) {
+    return {
+      title: 'Отлично!',
+      cls: 'correct',
+      text: 'Вы уверенно ведёте диалог: выявляете потребность, мягко работаете с возражениями и завершаете консультацию без давления. Именно так и должен звучать фармацевт первого стола.'
+    };
+  }
+  if (percent >= 70) {
+    return {
+      title: 'Хорошо',
+      cls: 'correct',
+      text: 'Крепкий результат. Есть точки роста — посмотрите разбор ниже, где именно вы теряли баллы, и отработайте эти реплики.'
+    };
+  }
+  if (percent >= 50) {
+    return {
+      title: 'Удовлетворительно',
+      cls: 'partial',
+      text: 'База есть, но в работе с возражениями вы действуете шаблонно. Обратите внимание на открытые вопросы и технику присоединения к клиенту.'
+    };
+  }
+  return {
+    title: 'Нужна практика',
+    cls: 'wrong',
+    text: 'Пока что вы теряете контакт с клиентом. Пересмотрите разбор — там указано, где именно была допущена ошибка. Пройдите тренажёр заново.'
+  };
+}
+
+function renderResult(){
+  state.phase = 'result';
+  setProgress(100, 'Результат');
+
+  const percent = Math.round((state.score / MAX_SCORE) * 100);
+  const rating = getRating(percent);
+
+  const breakdownHTML = state.answers.map(a => `
+    <div class="breakdown-item ${a.verdict}">
+      <div class="bi-score">+${a.score}</div>
+      <div class="bi-body">
+        <div class="bi-step">${escapeHTML(a.stepTitle)}</div>
+        <div class="bi-choice">${escapeHTML(a.choiceText)}</div>
+      </div>
+    </div>
+  `).join('');
+
+  els.screen.innerHTML = `
+    <div class="result">
+      <div class="result-head">
+        <div class="result-label">Ваш результат</div>
+        <div class="result-score">${state.score}<small> / ${MAX_SCORE}</small></div>
+        <div class="result-rating ${rating.cls}">${rating.title}</div>
+        <p class="result-text">${rating.text}</p>
+      </div>
+
+      <div class="breakdown">
+        <div class="breakdown-title">Разбор ваших ответов</div>
+        ${breakdownHTML}
+      </div>
+
+      <button class="restart-btn" id="restartBtn">Пройти заново</button>
+    </div>
+  `;
+
+  document.getElementById('restartBtn').addEventListener('click', renderIntro);
+  els.screen.scrollTop = 0;
+}
+
+/* =========================================================
+   СТАРТ
+   ========================================================= */
+renderIntro();
+</script>
+</body>
+</html>
